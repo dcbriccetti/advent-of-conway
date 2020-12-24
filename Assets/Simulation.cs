@@ -64,15 +64,12 @@ public class Simulation : MonoBehaviour {
 
         return numNewActives;
     }
-    
+
     private static void ForAllCells(int start, int end, Action<int, int, int> action) {
-        for (int x = start; x <= end; x++) {
-            for (int y = start; y <= end; y++) {
-                for (int z = start; z <= end; z++) {
-                    action(x, y, z);
-                }
-            }
-        }
+        for (int x = start; x <= end; x++)
+        for (int y = start; y <= end; y++)
+        for (int z = start; z <= end; z++)
+            action(x, y, z);
     }
 
     private int NumNeighbors(Vector3Int point) {
@@ -89,8 +86,6 @@ public class Simulation : MonoBehaviour {
         return num;
     }
 
-    private static bool InBounds(IEnumerable<int> coords) {
-        var good = from coord in coords where coord >= 0 && coord < Dim select coord;
-        return good.Count() == 3;
-    }
+    private static bool InBounds(IEnumerable<int> coords) => 
+        (from coord in coords where coord >= 0 && coord < Dim select coord).Count() == 3;
 }
