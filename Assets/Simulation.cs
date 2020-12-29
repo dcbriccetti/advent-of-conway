@@ -5,9 +5,9 @@ using System.Linq;
 using UnityEngine;
 
 public class Simulation : MonoBehaviour {
-    public Transform cubePrefab;
+    public GameObject cubePrefab;
     private const int Dim = 16;
-    private Transform[,,] space;
+    private GameObject[,,] space;
 
     private void Start() {
         space = BuildSpace();
@@ -22,8 +22,8 @@ public class Simulation : MonoBehaviour {
         }
     }
 
-    private Transform[,,] BuildSpace() {
-        var newSpace = new Transform[Dim, Dim, Dim];
+    private GameObject[,,] BuildSpace() {
+        var newSpace = new GameObject[Dim, Dim, Dim];
         string[] lines = Resources.Load<TextAsset>("starting-config").text.Split('\n');
         var startingConfigSize = new Vector2Int(lines[0].Length, lines.Length);
         var halfDims = new Vector2Int(Dim, Dim) / 2;
@@ -31,7 +31,7 @@ public class Simulation : MonoBehaviour {
 
         ForAllCells(0, Dim-1, (x, y, z) => {
             var alive = false;
-            var cube = Instantiate(cubePrefab, new Vector3(x, Dim - y, z), Quaternion.identity);
+            GameObject cube = Instantiate(cubePrefab, new Vector3(x, Dim - y, z), Quaternion.identity);
             if (z == Dim / 2) {
                 var inputIndex = new Vector2Int(x, y) - centerOffset;
 
@@ -41,7 +41,7 @@ public class Simulation : MonoBehaviour {
                     alive = true;
             }
 
-            if (! alive) cube.gameObject.SetActive(false);
+            if (! alive) cube.SetActive(false);
             newSpace[x, y, z] = cube;
         });
 
@@ -53,14 +53,14 @@ public class Simulation : MonoBehaviour {
         var numNewActives = 0;
         ForAllCells(0, Dim-1, (x, y, z) => {
             var nn = NumNeighbors(new Vector3Int(x, y, z));
-            var active = space[x, y, z].gameObject.activeSelf;
+            var active = space[x, y, z].activeSelf;
             var newActive = active ? nn == 2 || nn == 3 : nn == 3;
             if (active != newActive || nn == 2 || nn == 3)
                 Debug.Log($"x: {x}, y: {y}, z: {z}, nn: {nn}, {active}->{newActive}");
             if (newActive) ++numNewActives;
             newActives[x, y, z] = newActive;
         });
-        ForAllCells(0, Dim-1, (x, y, z) => space[x, y, z].gameObject.SetActive(newActives[x, y, z]));
+        ForAllCells(0, Dim-1, (x, y, z) => space[x, y, z].SetActive(newActives[x, y, z]));
 
         return numNewActives;
     }
@@ -79,7 +79,7 @@ public class Simulation : MonoBehaviour {
             int y = point.y + dy;
             int z = point.z + dz;
             if (!InBounds(new[] {x, y, z}) || new Vector3Int(dx, dy, dz) == Vector3Int.zero) return;
-            if (space[x, y, z].gameObject.activeSelf)
+            if (space[x, y, z].activeSelf)
                 ++num;
         });
 
